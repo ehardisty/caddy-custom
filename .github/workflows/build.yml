@@ -30,7 +30,7 @@ jobs:
       run: docker pull registry.aquasec.com/scanner:latest-saas
 
     - name: Run Aqua Image Scan
-      run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:latest-saas scan -H ${{ secrets.AQUA_CONSOLE_URL }} --token ${{ secrets.AQUA_SCANNER_TOKEN }} --local my-demo-image:${{ github.sha }} --registry "ehardisty-dockerhub"
+      run: docker run -e BUILD_JOB_NAME=$GITHUB_REPOSITORY -e BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID -e BUILD_NUMBER=$GITHUB_RUN_ID  --rm -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:latest-saas scan -H ${{ secrets.AQUA_CONSOLE_URL }} --token ${{ secrets.AQUA_SCANNER_TOKEN }} --local my-demo-image:${{ github.sha }} --registry "ehardisty-dockerhub"
 # End of Aqua Scan 
 
     - name: Push to Registry
