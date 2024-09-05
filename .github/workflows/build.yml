@@ -17,10 +17,23 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-demo-image:${{ github.sha }}
+      run: docker build . --file Dockerfile --tag $GITHUB_REPOSITORY:${{ github.sha }}
+      
+# Begin of Aqua Scan
+    - name: Login to Aqua Registry
+      run: docker login registry.aquasec.com -u ${{ secrets.AQUA_REGISTRY_USER }} -p ${{ secrets.AQUA_REGISTRY_PASSWORD }}
 
-    - name: Tag image with Registry
-      run: docker tag my-demo-image:${{ github.sha }} my-registry/my-demo-image:${{ github.sha }}
+    - name: Pull Aqua Scanner
+      run: docker pull registry.aquasec.com/scanner:latest-saas
+
+    - name: Run Aqua Image Scan
+      run: docker run -e BUILD_JOB_NAME=$GITHUB_REPOSITORY -e BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID -e BUILD_NUMBER=$GITHUB_RUN_ID  --rm -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:latest-saas scan -H ${{ secrets.AQUA_CONSOLE_URL }} --token ${{ secrets.AQUA_SCANNER_TOKEN }} --local $GITHUB_REPOSITORY:${{ github.sha }} --registry "ehardisty-dockerhub" --register  
+# End of Aqua Scan 
+    - name: Log in to Docker Hub
+      uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Push to Registry
-      run: echo "docker push my-registry/my-demo-image:${{ github.sha }}"
+      run: docker push $GITHUB_REPOSITORY:${{ github.sha }}
