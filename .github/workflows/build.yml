@@ -24,10 +24,10 @@ jobs:
       run: docker login registry.aquasec.com -u ${{ secrets.AQUA_REGISTRY_USER }} -p ${{ secrets.AQUA_REGISTRY_PASSWORD }}
 
     - name: Pull Aqua Scanner
-      run: docker pull registry.aquasec.com/scanner:10.2.0
+      run: docker pull registry.aquasec.com/scanner:2511.2.11
 
     - name: Run Aqua Image Scan
-      run: docker run -e LOG_LEVEL=INFO -e BUILD_JOB_NAME=$GITHUB_REPOSITORY -e BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID -e BUILD_NUMBER=$GITHUB_RUN_ID  --rm -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:10.2.0 scan -H ${{ secrets.AQUA_CONSOLE_URL }} -n -U ${{ secrets.AQUA_SCANNER_USER }} -P ${{ secrets.AQUA_SCANNER_PASS }} --local $GITHUB_REPOSITORY:${{ github.sha }} --registry "dockerhub-ehardisty" --register-compliant  
+      run: docker run -e LOG_LEVEL=INFO -e BUILD_JOB_NAME=$GITHUB_REPOSITORY -e BUILD_URL=$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID -e BUILD_NUMBER=$GITHUB_RUN_ID  --rm -v /var/run/docker.sock:/var/run/docker.sock registry.aquasec.com/scanner:2511.2.11 scan -H ${{ secrets.AQUA_CONSOLE_URL }} --token ${{ secrets.AQUA_SCANNER_TOKEN }} --local $GITHUB_REPOSITORY:${{ github.sha }} --registry "dockerhub-ehardisty" --register-compliant  
 # End of Aqua Scan 
     - name: Log in to Docker Hub
       uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
